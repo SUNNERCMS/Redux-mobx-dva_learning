@@ -75,3 +75,45 @@ class TodoList extends Component {
 }
 export default TodoList;
 ```
+
+
+##### tag-v2: redux的基本完整流程-todolist示例
+在v1版本上增加了，通过dispatch分发action给数据仓库store，改变数据的处理,详细代码及注释见v2。
+相关代码如下：
+```html
+    <Input 
+        placeholder={inputValue}
+        style={{ width:'250px', marginRight:'10px'}}
+        onChange={this.intputOnchange}
+    />
+```
+```js
+    // 输入框内容改变事件处理函数，改变之后发生动作，来改变store仓库中数据
+    //改变store数据的唯一途径：通过dispatch进行action驱动
+    //action为动作说明对象：动作类型+动作数据
+    intputOnchange = (e) => {
+        const action = {
+            type: 'change_input_value',
+            value: e.target.value
+        };
+        store.dispatch(action);
+    }
+
+//reducer.js文件
+  if(action.type === "change_input_value") {
+    //创建仓库数据副本，（记住：Reducer里只能接收state，不能改变state。） 
+    let newState = JSON.parse(JSON.stringify(state));
+    newState.inputValue = action.value;
+    return newState;
+  }
+
+// Todolist.js
+    //订阅Redux的状态,当状态改变时，执行相应函数
+    store.subscribe(this.storeChange);
+
+    //store数据仓库改变时，获取仓库数据，对该组件进行setState触发render渲染
+    storeChange = () => {
+        this.setState(store.getState());
+    }
+```
+

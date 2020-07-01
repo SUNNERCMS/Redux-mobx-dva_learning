@@ -8,7 +8,7 @@ class TodoList extends Component {
         super(props);
         //store.getState();获取到数据仓库中的数据对象
         this.state = store.getState();
-        ////订阅Redux的状态,当状态改变时，执行相应函数
+        //订阅Redux的状态,当状态改变时，执行相应函数
         store.subscribe(this.storeChange);
     }
 
@@ -25,7 +25,6 @@ class TodoList extends Component {
 
     //store数据仓库改变时，获取仓库数据，对该组件进行setState触发render渲染
     storeChange = () => {
-        console.log('jjj:', store.getState());
         this.setState(store.getState());
     }
 
