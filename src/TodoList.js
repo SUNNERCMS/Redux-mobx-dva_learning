@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
-import 'antd/dist/antd.css'
-import { Input, Button, List } from 'antd'
+import 'antd/dist/antd.css';
+import { Input, Button, List } from 'antd';
 import store from './store';
+import { 
+    changeInputValueAction, 
+    addInputValueAction,
+    deleteItemAction
+} from './store/actionCreators.js';
 
 class TodoList extends Component {
     constructor(props) {
@@ -16,10 +21,7 @@ class TodoList extends Component {
     //改变store数据的唯一途径：通过dispatch进行action驱动
     //action为动作说明对象：动作类型+动作数据
     intputOnchange = (e) => {
-        const action = {
-            type: 'change_input_value',
-            value: e.target.value
-        };
+        const action = changeInputValueAction(e.target.value);
         store.dispatch(action);
     }
 
@@ -30,18 +32,13 @@ class TodoList extends Component {
 
     //增加按钮点击事件，触发动作之后根据动作类型在reducer中将input改变的最新值，添加到list中，来驱动列表更新
     addInputValue = () => {
-        const action = {
-            type: 'add_input_value',
-        };
+        const action = addInputValueAction();
         store.dispatch(action)
     }
 
     //删除列表某一项
     deleteItem = (index) => {
-        const action = {
-            type: 'delete_item',
-            index
-        };
+        const action = deleteItemAction(index);
         store.dispatch(action)
 
     }

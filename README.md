@@ -117,3 +117,46 @@ export default TodoList;
     }
 ```
 
+tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
+-  `actionType.js`文件用来统一管理action的类型，因为之前在reducer和需要dispatch action的地方均需要指明action的类型，并且二者保持一致，不便于管理维护。
+- `actionCreators.js`文件，用来创建action对象，可以是函数形式返回一个包含类型和值的对象，用来生成需要的action对象，供dispatch传递给store仓库，来进行数据更新操作。  
+
+相关代码如下：
+```js
+//统一用来管理action类型
+
+export const CHANGE_INPUT_VALUE= 'change_input_value';
+export const ADD_INPUT_VALUE= 'add_input_value';
+export const DELETE_ITEM= 'delete_item'
+```
+
+```js
+import { 
+  CHANGE_INPUT_VALUE, 
+  ADD_INPUT_VALUE,
+  DELETE_ITEM
+} from './actionType.js';
+
+// 输入框内容改变处理动作
+export const changeInputValueAction = (value) => ({
+  type: CHANGE_INPUT_VALUE,
+  value
+});
+
+// 增加按钮点击处理动作
+export const addInputValueAction = () => ({
+  type: ADD_INPUT_VALUE
+});
+
+// 删除列表某一项处理动作
+export const deleteItemAction = (index) => ({
+  type: DELETE_ITEM,
+  index
+});
+
+intputOnchange = (e) => {
+    const action = changeInputValueAction(e.target.value);
+    store.dispatch(action);
+}
+```
+
