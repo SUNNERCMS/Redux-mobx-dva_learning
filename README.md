@@ -1,4 +1,4 @@
-##### tag-v1: 基本的redux使用流程
+#### tag-v1: 基本的redux使用流程
 1、store文件，用来生成store来作为数据仓库
 
 > （1）引入createStore方法,用来生成 Store创建数据存储仓库
@@ -76,8 +76,7 @@ class TodoList extends Component {
 export default TodoList;
 ```
 
-
-##### tag-v2: redux的基本完整流程-todolist示例
+#### tag-v2: redux的基本完整流程-todolist示例
 在v1版本上增加了，通过dispatch分发action给数据仓库store，改变数据的处理,详细代码及注释见v2。
 相关代码如下：
 ```html
@@ -117,7 +116,7 @@ export default TodoList;
     }
 ```
 
-##### tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
+#### tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
 -  `actionType.js`文件用来统一管理action的类型，因为之前在reducer和需要dispatch action的地方均需要指明action的类型，并且二者保持一致，不便于管理维护。
 - `actionCreators.js`文件，用来创建action对象，可以是函数形式返回一个包含类型和值的对象，用来生成需要的action对象，供dispatch传递给store仓库，来进行数据更新操作。  
 
@@ -160,11 +159,11 @@ intputOnchange = (e) => {
 }
 ```
 
-##### tag-v4: Todolist函数式组件拆分+axios请求与redux结合
+#### tag-v4: Todolist函数式组件拆分+axios请求与redux结合
 - TodoList.js：处理业务逻辑，包括交互事件处理，数据请求，分发action等
 - TodoListUI.js：函数式组件用来负责渲染界面展示  
 
-axios请求与redux结合过程：
+axios请求与redux结合过程：  
 1、声明axios获取数据更新到store的action类型
 ```js
 export const GET_LIST= 'get_list'
@@ -186,6 +185,80 @@ export const getListAction = (data) => ({
             const action = getListAction(res.data.data.list);
             store.dispatch(action);
         });
+    }
+```
+
+#### tag-v5: redux-thunk与reudx的结合使用
+前言：在控制台调试这些仓库里的数据，需要使用Redux DevTools谷歌插件，在创建仓库时，进行判断是否有该插件，有的话就使用。  
+```js
+const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+```
+> 问题：如果按照官方文档来写，直接把thunk放到createStore里的第二个参数就可以了，但以前我们配置了Redux Dev Tools，已经占用了第二个参数。    
+
+官方文档给的方法:  
+```js
+const store = createStore(
+    reducer,
+    applyMiddleware(thunk)
+) // 创建数据存储仓库
+```
+这样写是完全没有问题的，但是我们的Redux Dev Tools插件就不能使用了，如果想两个同时使用，需要使用增强函数。使用增加函数前需要先引入compose。
+
+```js
+import { createStore , applyMiddleware ,compose } from 'redux'  //  引入createStore方法
+import reducer from './reducer'    
+import thunk from 'redux-thunk'
+
+const composeEnhancers =   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}):compose
+
+const enhancer = composeEnhancers(applyMiddleware(thunk))
+
+const store = createStore( reducer, enhancer) // 创建数据存储仓库
+export default store   //暴露出去
+```
+(1)利用compose创造一个增强函数，就相当于建立了一个链式函数.(2)有了增强函数后，就可以把thunk加入进来了，这样两个函数就都会执行了。(3)这时候直接在createStore函数中的第二个参数，使用这个enhancer变量就可以了，相当于两个函数都执行了。也许你对增加函数还不能完全理解，其实你完全把这个想成固定代码，直接使用就好.
+
+**redux-thunk与reudx的结合使用过程：**  
+1、安装reudx-thunk `npm install --save redux-thunk`  
+2、引用redux的applyMiddleware，来在redux中使用中间件 `applyMiddleware(thunk)`,并在创建函数时作为参数项注册，见上文前言。  
+3、在Dispatch一个Action之后，到达reducer之前，可以使用中间件来进行日志记录、创建崩溃报告，调用异步接口等。  
+4、将在组件执行的接口请求逻辑，转移到actionCreator.js文件中。  
+
+> 以前actionCreators.js都是定义好的action，根本没办法写业务逻辑，
+有了Redux-thunk之后，可以把TodoList.js中的componentDidMount业务逻辑放到这里来编写。
+也就是把向后台请求数据的代码放到actionCreators.js文件里。
+（以前的action是对象，现在的action可以是函数了，这就是redux-thunk带来的好处）
+
+```js
+//actionCreator.js
+//获取列表数据（需要包含更新动作getListAction）
+//这个函数可以直接传递dispatch进去，这是自动的，然后我们直接用dispatch(action)传递就好了
+export const getTodoList = () => {
+  return (dispatch) => {
+    axios.get("https://mock.yonyoucloud.com/mock/10365/reactdemo/todolist")
+    .then(res => {
+        const action = getListAction(res.data.data.list);
+        dispatch(action);
+    });
+  }
+}
+```
+```js
+//TodoList.js
+    //获取列表数据
+    // requestListData = () => {
+    //     axios.get("https://mock.yonyoucloud.com/mock/10365/reactdemo/todolist")
+    //     .then(res => {
+    //         const action = getListAction(res.data.data.list);
+    //         store.dispatch(action);
+    //     });
+    // }
+   componentDidMount() {
+        // this.requestListData();
+        const action = getTodoList();
+        //使用redux-thunk,在dispathc分发action到reducer之前，进行了axios请求
+        store.dispatch(action);
     }
 ```
 
