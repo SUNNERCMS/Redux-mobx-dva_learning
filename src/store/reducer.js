@@ -1,16 +1,14 @@
 import { 
   CHANGE_INPUT_VALUE, 
   ADD_INPUT_VALUE,
-  DELETE_ITEM
+  DELETE_ITEM,
+  GET_LIST
 } from './actionType.js';
 
 //默认数据,整个项目中需要管理的数据信息
 const defaultState = {
   inputValue : 'Write Something!',
-  list:[
-      '早上4点起床，锻炼身体',
-      '中午下班游泳一小时'
-  ]
+  list:[]
 } 
 
 // state: 指的是原始仓库里的状态。
@@ -35,6 +33,11 @@ export default (state = defaultState, action) => {
     let newState = JSON.parse(JSON.stringify(state));
     newState.list.splice(action.index, 1);
     newState.inputValue = '';
+    return newState;
+  }
+  if(action.type === GET_LIST) {
+    let newState = JSON.parse(JSON.stringify(state));
+    newState.list = action.data;
     return newState;
   }
   return state

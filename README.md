@@ -117,7 +117,7 @@ export default TodoList;
     }
 ```
 
-tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
+##### tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
 -  `actionType.js`文件用来统一管理action的类型，因为之前在reducer和需要dispatch action的地方均需要指明action的类型，并且二者保持一致，不便于管理维护。
 - `actionCreators.js`文件，用来创建action对象，可以是函数形式返回一个包含类型和值的对象，用来生成需要的action对象，供dispatch传递给store仓库，来进行数据更新操作。  
 
@@ -159,4 +159,34 @@ intputOnchange = (e) => {
     store.dispatch(action);
 }
 ```
+
+##### tag-v4: Todolist函数式组件拆分+axios请求与redux结合
+- TodoList.js：处理业务逻辑，包括交互事件处理，数据请求，分发action等
+- TodoListUI.js：函数式组件用来负责渲染界面展示  
+
+axios请求与redux结合过程：
+1、声明axios获取数据更新到store的action类型
+```js
+export const GET_LIST= 'get_list'
+```
+2、创建action对象，用于dispatc分发给store
+```js
+// 将请求获取的列表数据更新到数据仓库
+export const getListAction = (data) => ({
+  type: GET_LIST,
+  data
+});
+```
+3、进行请求并执行分发dispatch，数据mock可以用easy-mock或者用友的yapi
+```js
+  //获取列表数据
+    requestListData = () => {
+        axios.get("https://mock.yonyoucloud.com/mock/10365/reactdemo/todolist")
+        .then(res => {
+            const action = getListAction(res.data.data.list);
+            store.dispatch(action);
+        });
+    }
+```
+
 

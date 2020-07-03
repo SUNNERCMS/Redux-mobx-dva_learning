@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import 'antd/dist/antd.css';
-import { Input, Button, List } from 'antd';
 import store from './store';
+import TodoListUI from './TodoListUI';
+import axios from 'axios';
 import { 
     changeInputValueAction, 
     addInputValueAction,
-    deleteItemAction
+    deleteItemAction,
+    getListAction
 } from './store/actionCreators.js';
 
 class TodoList extends Component {
@@ -43,39 +44,32 @@ class TodoList extends Component {
 
     }
 
+    //获取列表数据
+    requestListData = () => {
+        axios.get("https://mock.yonyoucloud.com/mock/10365/reactdemo/todolist")
+        .then(res => {
+            const action = getListAction(res.data.data.list);
+            store.dispatch(action);
+        });
+    }
+
+    componentDidMount() {
+        this.requestListData();
+    }
+
 
     render() { 
         const {
             inputValue,  
             list
         } = this.state;
-        return ( 
-            <div style={{margin:'10px'}}>
-                <div>
-                    <Input 
-                        placeholder={inputValue}
-                        style={{ width:'250px', marginRight:'10px'}}
-                        onChange={this.intputOnchange}
-                    />
-                    <Button 
-                        type="primary"
-                        onClick={this.addInputValue}
-                    >
-                        增加{inputValue}
-                    </Button>
-                </div>
-                <div style={{margin:'10px',width:'300px'}}>
-                    <List
-                        bordered
-                        dataSource={list}
-                        renderItem={
-                            (item, index) => (
-                                <List.Item onClick={this.deleteItem.bind(this,index)}>{item}</List.Item>
-                            )}
-                    />    
-                </div>
-            </div>
-         );
+        return <TodoListUI
+                    inputValue={inputValue}
+                    list={list}
+                    intputOnchange={this.intputOnchange}
+                    addInputValue={this.addInputValue}
+                    deleteItem={this.deleteItem}
+                />
     }
 }
 export default TodoList;

@@ -3,7 +3,8 @@
 import { 
   CHANGE_INPUT_VALUE, 
   ADD_INPUT_VALUE,
-  DELETE_ITEM
+  DELETE_ITEM,
+  GET_LIST
 } from './actionType.js';
 
 // 输入框内容改变处理动作
@@ -21,4 +22,10 @@ export const addInputValueAction = () => ({
 export const deleteItemAction = (index) => ({
   type: DELETE_ITEM,
   index
+});
+
+// 将请求获取的列表数据更新到数据仓库
+export const getListAction = (data) => ({
+  type: GET_LIST,
+  data
 });
