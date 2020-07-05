@@ -334,4 +334,89 @@ export default mySaga
 （2）redux-saga可以使用saga中间件运行创建的saga.js文件，将actionCreators.js中函数形式的action（处理异步请求）放到来saga.js文件中，这样看来actionCreators.js中就全部是对象的action，saga.js中根据action的类型专门用来处理业务逻辑，再结合saga使用来ES6的Generator功能，让异步的流程更易于读取，写入和测试，结构也更加清晰
 （3）在不引入中间件时，请求的逻辑处理直接放在了组件中，在请求函数中调用了数据更新action的动作。
 
+### tag-v7: react-redux+redux-saga与reudx的结合使用
+> 无论是redux-thunk还是redux-saga和redux结合使用，在组件中要想使用store中的数据，都需要引入这个store，并进行数据仓库的监听。
+React-Redux这是一个React生态中常用组件，它可以简化Redux流程，通过和以上中间件的使用对比，react-redux组件带来的变化主要是改变了组件使用store的方式、获取store中state的方式、获取action的方式，这里不和redux-thunk以及redux-saga的使用冲突，相对而言，更是一种补充。  
+
+相关代码如下：
+```js
+import store from './store';
+
+    constructor(props) {
+        super(props);
+        //store.getState();获取到数据仓库中的数据对象
+        this.state = store.getState();
+        //订阅Redux的状态,当状态改变时，执行相应函数
+        store.subscribe(this.storeChange);
+    }
+
+    intputOnchange = (e) => {
+        const action = changeInputValueAction(e.target.value);
+        store.dispatch(action);
+    }
+
+    //store数据仓库改变时，获取仓库数据，对该组件进行setState触发render渲染
+    storeChange = () => {
+        this.setState(store.getState());
+    }
+```
+**react-redux的使用过程：**
+1、index文件中，引入Provider提供器，以及store，将store提供给Provider所包括的组件使用，不在组件中进行显示引用。
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TodoList from './TodoList';
+import { Provider } from 'react-redux';
+import store from './store/index';
+
+//声明一个App组件，然后这个组件用Provider进行包裹。
+// <Provider>是一个提供器，只要使用了这个组件，组件里边的其它所有组件都可以使用store了，这也是React-redux的核心组件了
+const App = (
+  <Provider store = {store}>
+    <TodoList/>
+  </Provider>
+)
+
+ReactDOM.render(App, document.getElementById('root'));
+```
+2、组件TodoList中使用connect连接器，连接的内容为：数据（将store中数据state映射到该组件props中）+ 事件(将actionCretors中action动作对象，映射给该组件props中方法，供该组件进行调用进行事件处理)
+```js
+   componentDidMount() {
+      this.props.getMyList();
+    }
+
+//映射关系就是把原来的state,（也即是原本通过store.getState()来获取仓库中数据）映射成组件中的props属性
+const stateToProps = (state) => {
+  return {
+    inputValue: state.inputValue,
+    list: state.list
+  }
+}
+const dispatchToProps = (dispatch) => {
+  return {
+    // 输入框内容改变事件处理函数，
+    intputOnchange(e){
+        const action = changeInputValueAction(e.target.value);
+        dispatch(action);
+    },
+    //增加按钮点击事件，触发动作之后根据动作类型在reducer中将input改变的最新值，添加到list中，来驱动列表更新
+    addInputValue(){
+        const action = addInputValueAction();
+        dispatch(action)
+    },
+    //删除列表某一项
+    deleteItem(index){
+        const action = deleteItemAction(index);
+        dispatch(action)
+    },
+    //获取列表数据
+    getMyList() {
+        const action = getMyListAction();
+        dispatch(action);
+    }
+  }
+}
+
+export default connect(stateToProps,dispatchToProps)(TodoList);
+```
 
