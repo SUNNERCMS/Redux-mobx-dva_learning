@@ -4,7 +4,8 @@ import {
   CHANGE_INPUT_VALUE, 
   ADD_INPUT_VALUE,
   DELETE_ITEM,
-  GET_LIST
+  GET_LIST,
+  GET_MY_LIST
 } from './actionType.js';
 import axios from 'axios';
 
@@ -33,6 +34,11 @@ export const getListAction = (data) => ({
   data
 });
 
+
+// saga-用来获取列表数据的动作
+export const getMyListAction = () => ({
+  type: GET_MY_LIST,
+});
 
 /*
 以前actionCreators.js都是定义好的action，根本没办法写业务逻辑，

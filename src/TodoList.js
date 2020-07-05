@@ -5,7 +5,7 @@ import {
     changeInputValueAction, 
     addInputValueAction,
     deleteItemAction,
-    getTodoList
+    getMyListAction
 } from './store/actionCreators.js';
 
 class TodoList extends Component {
@@ -43,19 +43,8 @@ class TodoList extends Component {
 
     }
 
-    // //获取列表数据
-    // requestListData = () => {
-    //     axios.get("https://mock.yonyoucloud.com/mock/10365/reactdemo/todolist")
-    //     .then(res => {
-    //         const action = getListAction(res.data.data.list);
-    //         store.dispatch(action);
-    //     });
-    // }
-
     componentDidMount() {
-        // this.requestListData();
-        const action = getTodoList();
-        //使用redux-thunk,在dispathc分发action到reducer之前，进行了axios请求
+        const action = getMyListAction();
         store.dispatch(action);
     }
 

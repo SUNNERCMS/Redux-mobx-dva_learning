@@ -262,4 +262,76 @@ export const getTodoList = () => {
     }
 ```
 
+#### tag-v6: redux-saga与reudx的结合使用
+
+> 安装reudx-saga `npm install --save redux-saga`  
+
+1、在store中引入saga，并注册到创建的store仓库中，运行saga,运行的内容就是创建的saga文件，用来管理业务代码的文件
+```js
+import { createStore, applyMiddleware, compose } from 'redux'; // 引入createStore方法,用来生成 Store
+import reducer from './reducer.js';
+import mySagas from './sagas.js';
+//引入redux的saga中间件，并创建
+import createSageMiddleware from 'redux-saga';
+const sagaMiddleware = createSageMiddleware();
+
+//创建增强函数，使得Redux Dev Tools插件和redux-thunk中间件都能使用
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}):compose
+const enhancer = composeEnhancers(applyMiddleware(sagaMiddleware))
+
+// 创建数据存储仓库,createStore函数接受另一个函数作为参数，返回新生成的 Store 对象
+const store = createStore(reducer, enhancer);
+
+//使用saga中间件来运行引入的mySagas,监听mySagas文件
+sagaMiddleware.run(mySagas);
+
+export default store;  //暴露出去
+```
+2、actionCreators.js文件中，增加用来获取列表动作的action，根据这个action类型到sagas.js文件中去查找真正用来处理业务请求的逻辑
+
+```js
+// saga-用来获取列表数据的动作
+export const getMyListAction = () => ({
+  type: GET_MY_LIST,
+});
+```
+3、sagas.js文件，mySaga函数是入口文件，在store/index中由saga中间件运行 `sagaMiddleware.run(mySagas);`,用来捕获action,并根据类型调用相对应的处理函数
+```js
+//管理业务逻辑
+//mySaga来作为入口函数。在入口函数中捕获传递过来的action类型，根据类型不同调用不同的方法。
+
+import { takeEvery, put } from 'redux-saga/effects';
+import { GET_MY_LIST } from './actionType';
+import { getListAction } from './actionCreators.js';
+import axios from 'axios'
+
+function* mySaga() {
+  //等待捕获action
+  yield takeEvery(GET_MY_LIST, getList);
+}
+
+function* getList() {
+  const res = yield axios.get("https://mock.yonyoucloud.com/mock/10365/reactdemo/todolist");
+  //调用aciont中的getListAction函数生成action，将请求获取的列表数据更新到数据仓库
+  const action = getListAction(res.data.data.list);
+  yield put(action);
+}
+
+export default mySaga
+```
+4、TodoList.js组件中调用actionCreators.js中的getMyListAction，用来发起获取列表数据的动作
+
+```js
+    componentDidMount() {
+        const action = getMyListAction();
+        store.dispatch(action);
+    }
+```
+**tag-v5:redux-thunk和tag-v6:redux-saga的使用感受：**
+*区别主要在于对副作用的管理上*  
+（1）redux-thunk使得原本只能是对象的action可以是函数，用来处理一些异步请求的操作，actonCreators.js中既有对象的action，也有函数的action。  
+（2）redux-saga可以使用saga中间件运行创建的saga.js文件，将actionCreators.js中函数形式的action（处理异步请求）放到来saga.js文件中，这样看来actionCreators.js中就全部是对象的action，saga.js中根据action的类型专门用来处理业务逻辑，再结合saga使用来ES6的Generator功能，让异步的流程更易于读取，写入和测试，结构也更加清晰
+（3）在不引入中间件时，请求的逻辑处理直接放在了组件中，在请求函数中调用了数据更新action的动作。
+
 
