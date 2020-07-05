@@ -1,4 +1,4 @@
-#### tag-v1: 基本的redux使用流程
+### tag-v1: 基本的redux使用流程
 1、store文件，用来生成store来作为数据仓库
 
 > （1）引入createStore方法,用来生成 Store创建数据存储仓库
@@ -76,7 +76,7 @@ class TodoList extends Component {
 export default TodoList;
 ```
 
-#### tag-v2: redux的基本完整流程-todolist示例
+### tag-v2: redux的基本完整流程-todolist示例
 在v1版本上增加了，通过dispatch分发action给数据仓库store，改变数据的处理,详细代码及注释见v2。
 相关代码如下：
 ```html
@@ -116,7 +116,7 @@ export default TodoList;
     }
 ```
 
-#### tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
+### tag-v3: redux结构分层（action类型管理文件+action动作管理文件）
 -  `actionType.js`文件用来统一管理action的类型，因为之前在reducer和需要dispatch action的地方均需要指明action的类型，并且二者保持一致，不便于管理维护。
 - `actionCreators.js`文件，用来创建action对象，可以是函数形式返回一个包含类型和值的对象，用来生成需要的action对象，供dispatch传递给store仓库，来进行数据更新操作。  
 
@@ -159,7 +159,7 @@ intputOnchange = (e) => {
 }
 ```
 
-#### tag-v4: Todolist函数式组件拆分+axios请求与redux结合
+### tag-v4: Todolist函数式组件拆分+axios请求与redux结合
 - TodoList.js：处理业务逻辑，包括交互事件处理，数据请求，分发action等
 - TodoListUI.js：函数式组件用来负责渲染界面展示  
 
@@ -188,7 +188,7 @@ export const getListAction = (data) => ({
     }
 ```
 
-#### tag-v5: redux-thunk与reudx的结合使用
+### tag-v5: redux-thunk与reudx的结合使用
 前言：在控制台调试这些仓库里的数据，需要使用Redux DevTools谷歌插件，在创建仓库时，进行判断是否有该插件，有的话就使用。  
 ```js
 const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
@@ -262,7 +262,7 @@ export const getTodoList = () => {
     }
 ```
 
-#### tag-v6: redux-saga与reudx的结合使用
+### tag-v6: redux-saga与reudx的结合使用
 
 > 安装reudx-saga `npm install --save redux-saga`  
 
