@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux'; // 引入createStore方法,用来生成 Store
-import reducer from './reducer.js';
+import reducer from './reducers/index';
+// import reducer from './reducer.js';
 import mySagas from './sagas.js';
 //引入redux的saga中间件，并创建
 import createSageMiddleware from 'redux-saga';

@@ -36,8 +36,8 @@ class TodoList extends Component {
 //映射关系就是把原来的state,（也即是原本通过store.getState()来获取仓库中数据）映射成组件中的props属性
 const stateToProps = (state) => {
   return {
-    inputValue: state.inputValue,
-    list: state.list
+    inputValue: state.todoListReducer.inputValue,
+    list: state.todoListReducer.list
   }
 }
 const dispatchToProps = (dispatch) => {

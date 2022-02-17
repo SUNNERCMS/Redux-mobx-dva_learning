@@ -5,7 +5,12 @@ import {
   ADD_INPUT_VALUE,
   DELETE_ITEM,
   GET_LIST,
-  GET_MY_LIST
+  GET_MY_LIST,
+
+  COUNTER_1_COUNTER_1_COUNT_ADD,
+  COUNTER_1_COUNTER_1_COUNT_SUB,
+  COUNTER_1_COUNTER_3_COUNT_SUB,
+  COUNTER_1_COUNTER_3_COUNT_ADD
 } from './actionType.js';
 import axios from 'axios';
 
@@ -58,3 +63,26 @@ export const getTodoList = () => {
     });
   }
 }
+
+
+
+// count计算器相关
+export const onCounter1CountAdd = (data) => ({
+  type: COUNTER_1_COUNTER_1_COUNT_ADD,
+  data
+});
+
+export const onCounter1CountSub = (data) => ({
+  type: COUNTER_1_COUNTER_1_COUNT_SUB,
+  data
+});
+
+export const onCounter3CountAdd = (data) => ({
+  type: COUNTER_1_COUNTER_3_COUNT_ADD,
+  data
+});
+
+export const onCounter3CountSub = (data) => ({
+  type: COUNTER_1_COUNTER_3_COUNT_SUB,
+  data
+});
